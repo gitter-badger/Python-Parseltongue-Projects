@@ -1,30 +1,31 @@
 __author__ = "The Artha Group"
 
 import bot_constants as bot_const
-from bot_intelligence import action
+import bot_intelligence as bot_intellect
 import global_functions as g_func
 
 
-class Switch(object):
+ui_suffix = " >> "
 
-    def __init__(self, value):
-        self.value = value
-        self.fall = False
+def bot_action(x):
+    react = ""
+    bot_log(0, 1, x)
+    x = g_func.clean_for_artha(x)
 
-    def __iter__(self):
-        """Return the match method once, then stop"""
-        yield self.match
-        raise StopIteration
+    if x == "":
+        x = -1
+    else:
+        x.decode('utf-8')
+        x = x.lower()
 
-    def match(self, *args):
-        """Indicate whether or not to enter a case suite"""
-        if self.fall or not args:
-            return True
-        elif self.value in args:
-            self.fall = True
-            return True
-        else:
-            return False
+    for case in g_func.Switch(x):
+        if case(-1):
+            react = "Say something."
+            break
+        if case():  # default reply, omit possible 'if True'
+            react = bot_intellect.bot_interpret(x)
+    if react != -1:
+        bot_output(react)
 
 
 def bot_call(err):
@@ -32,28 +33,30 @@ def bot_call(err):
     for f in bot_const.must_files:
         if not open(bot_const.bot_base+f+".artha"):
             err = -1
-    bot_output("Welcome! Please begin.")
+    bot_output(bot_intellect.bot_greeting())
     return err
 
 
 def bot_input(opt):
     cmd = ""
     if opt == 1:
-        cmd = raw_input("Me: " + cmd)
+        cmd = raw_input("Me"+ui_suffix+cmd)
     elif opt == 2:
-        cmd = raw_input("Me: ")
+        cmd = raw_input("Me"+ui_suffix)
     return cmd
 
 
 def bot_output(x):
-    print(bot_const.bot_name+": "+x)
+    if x is None:
+        x = ""
+    print(bot_const.bot_name+ui_suffix+x)
     bot_log(0, 0, x)
 
 
 def bot_control():
     while 1:
         cmd = bot_input(2)
-        action(cmd)
+        bot_action(cmd)
 
 
 def bot_log(opt=0, agent=0, buff=None, lfn=None):
