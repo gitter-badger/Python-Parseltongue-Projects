@@ -124,4 +124,3 @@ def upper_first_char(x):
     :return: text out
     """
     return x[0].upper() + x[1:]
-
