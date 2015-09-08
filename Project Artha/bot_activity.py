@@ -6,6 +6,9 @@ import global_functions as g_func
 
 
 ui_suffix = " >> "
+bot_cache_in = []
+bot_cache_out = []
+
 
 def bot_action(x):
     react = ""
@@ -26,6 +29,8 @@ def bot_action(x):
             react = bot_intellect.bot_interpret(x)
     if react != -1:
         bot_output(react)
+    else:
+        return react
 
 
 def bot_call(err):
@@ -49,7 +54,7 @@ def bot_input(opt):
 def bot_output(x):
     if x is None:
         x = ""
-    print(bot_const.bot_name+ui_suffix+x)
+    print g_func.parse_artha_vars((bot_const.bot_name+ui_suffix+x))
     bot_log(0, 0, x)
 
 

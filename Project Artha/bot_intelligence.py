@@ -3,26 +3,8 @@ __author__ = "The Artha Group"
 import os
 import random
 import global_functions as g_func
+import bot_activity as bot_act
 import bot_constants as bot_const
-
-
-def bot_process(term):
-    senses = bot_senses()
-    for sense in senses:
-        if sense in term:
-            lines = [line.rstrip('\n') for line in open(bot_const.bot_sense_base+sense+'_keys.artha')]
-            if g_func.clean_for_artha(term.replace(sense, "", 1)) in lines:
-                ln = lines.index(g_func.clean_for_artha(term.replace(sense, "", 1)))
-                lines_x = [line.rstrip('\n') for line in open(bot_const.bot_sense_base+sense+'_replies.artha')]
-                return lines_x[ln]
-            elif g_func.clean_for_artha(term.replace(sense+" a", "", 1)) in lines:
-                ln = lines.index(g_func.clean_for_artha(term.replace(sense+" a", "", 1)))
-                lines_x = [line.rstrip('\n') for line in open(bot_const.bot_sense_base+sense+'_replies.artha')]
-                return lines_x[ln]
-            else:
-                return bot_down()
-        else:
-                return bot_def_down()
 
 
 def bot_senses():
@@ -32,6 +14,26 @@ def bot_senses():
         if '_replies.artha' not in s:
             true_senses.append(s.replace('_keys.artha', ''))
     return true_senses
+
+
+def bot_process(term):
+    out = None
+    for sense in bot_senses():
+        if sense in term:
+            lines = [line.rstrip('\n') for line in open(bot_const.bot_sense_base+sense+'_keys.artha')]
+            if g_func.clean_for_artha(term.replace(sense, "", 1)) in lines:
+                ln = lines.index(g_func.clean_for_artha(term.replace(sense, "", 1)))
+                lines_x = [line.rstrip('\n') for line in open(bot_const.bot_sense_base+sense+'_replies.artha')]
+                out = lines_x[ln]
+            elif g_func.clean_for_artha(term.replace(sense+" a", "", 1)) in lines:
+                ln = lines.index(g_func.clean_for_artha(term.replace(sense+" a", "", 1)))
+                lines_x = [line.rstrip('\n') for line in open(bot_const.bot_sense_base+sense+'_replies.artha')]
+                out = lines_x[ln]
+            else:
+                out = bot_down()
+    if out is None:
+        out = bot_def_down()
+    return out
 
 
 def bot_interpret(term):
@@ -47,7 +49,7 @@ def bot_interpret(term):
 
 def bot_greeting():
     lines = [line.rstrip('\n') for line in open(bot_const.bot_base+'greetings.artha')]
-    return random.choice(lines)
+    return g_func.upper_first_char(random.choice(lines))
 
 
 def bot_down():

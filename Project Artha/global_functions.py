@@ -3,7 +3,7 @@ __author__ = "The Artha Group"
 import urllib
 import os
 import re
-
+import bot_constants as bot_const
 
 class Switch(object):
     """
@@ -64,6 +64,13 @@ def get_remote_file(url, opt=0, filename=None):
 
 
 def write_local_file(fn, fc, m):
+    """
+    Write into a local file
+    :param fn: filename
+    :param fc: what to write
+    :param m: file open mode
+    :return:
+    """
     fs = open(fn, m)
     fs.write(fc)
     fs.close()
@@ -71,11 +78,19 @@ def write_local_file(fn, fc, m):
 
 
 def include(filename):
+    """
+    File inclusion
+    """
     if os.path.exists(filename):
         execfile(filename)
 
 
 def clean_for_artha(x):
+    """
+    Remove punctuation and trim space, tabs and lines
+    :param x: text in
+    :return: sanitized text out
+    """
     x = x.replace('\'', '')
     x = re.sub(r'[^\w]', ' ', x)
     x = re.sub('\s+', ' ', x)
@@ -85,5 +100,28 @@ def clean_for_artha(x):
 
 
 def files_in_dir(dir_name):
+    """
+    Files in a folder
+    :param dir_name: folder name
+    :return: list of files
+    """
     return [x for x in os.listdir(dir_name) if os.path.isfile(dir_name+'/'+x)]
+
+def parse_artha_vars(x):
+    """
+    Parse the list bot_parsing[]
+    :param x: text in
+    :return: text out
+    """
+    for match in bot_const.bot_parsing:
+        if match and bot_const.bot_parsing[match] is not None:
+            return x.replace(match, bot_const.bot_parsing[match])
+
+def upper_first_char(x):
+    """
+    Capitalize first letter in string.
+    :param x: text in
+    :return: text out
+    """
+    return x[0].upper() + x[1:]
 
